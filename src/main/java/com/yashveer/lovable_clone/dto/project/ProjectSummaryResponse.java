@@ -7,5 +7,6 @@ public record ProjectSummaryResponse(
         String name,
         Instant createdAt,
         Instant updatedAt
+
 ) {
 }
