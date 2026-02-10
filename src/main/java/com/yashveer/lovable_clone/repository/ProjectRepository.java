@@ -7,9 +7,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project,Long> {
     @Query(" SELECT p FROM Project p WHERE p.deletedAt IS NULL AND p.owner.id = :userId ORDER BY p.updatedAt DESC")
     List<Project> findAllAccessibleByUser(@Param("userId") Long userId);
+
+    @Query("SELECT p FROM Project p LEFT JOIN FETCH p.owner where p.id = :projectId and p.deletedAt IS NULL AND p.owner.id = :userId")
+    Optional<Project> findAccessibleProjectById(@Param("projectId") Long projectId, @Param("userId") Long userId);
 }

@@ -1,11 +1,13 @@
 package com.yashveer.lovable_clone.entity;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.Embeddable;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+
 @Getter
 @Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@NoArgsConstructor
+@Embeddable
 public class ProjectMemberId {
     Long projectId;
     Long userId;
