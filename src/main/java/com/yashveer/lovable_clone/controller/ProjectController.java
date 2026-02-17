@@ -19,33 +19,28 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @GetMapping
-    public ResponseEntity<List<ProjectSummaryResponse>>getMyProjects(){
-        Long userId = 1L;
-        return ResponseEntity.ok(projectService.getUserProjects(userId));
+    public ResponseEntity<List<ProjectSummaryResponse>> getMyProjects() {
+        return ResponseEntity.ok(projectService.getUserProjects());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectResponse>getProjectById(@PathVariable Long id){
-        Long userId = 1L;
-        return ResponseEntity.ok(projectService.getUserProjectById(id,userId));
+    public ResponseEntity<ProjectResponse> getProjectById(@PathVariable Long id) {
+        return ResponseEntity.ok(projectService.getUserProjectById(id));
     }
 
     @PostMapping
-    public ResponseEntity<ProjectResponse>createProject(@RequestBody @Valid ProjectRequest request){
-        Long userId = 1L;
-        return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(request,userId));
+    public ResponseEntity<ProjectResponse> createProject(@RequestBody @Valid ProjectRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(request));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ProjectResponse>updateProject(@PathVariable Long id,@RequestBody @Valid ProjectRequest request){
-        Long userId = 1L;
-        return ResponseEntity.ok(projectService.updateProject(id,request,userId));
+    public ResponseEntity<ProjectResponse> updateProject(@PathVariable Long id, @RequestBody @Valid ProjectRequest request) {
+        return ResponseEntity.ok(projectService.updateProject(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void>deleteProject(@PathVariable Long id){
-        Long userId = 1L;
-        projectService.softDelete(id,userId);
+    public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
+        projectService.softDelete(id);
         return ResponseEntity.noContent().build();
     }
 }

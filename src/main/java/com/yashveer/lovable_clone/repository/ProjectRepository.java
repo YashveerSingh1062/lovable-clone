@@ -11,9 +11,27 @@ import java.util.Optional;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project,Long> {
-    @Query(" SELECT p FROM Project p WHERE p.deletedAt IS NULL ORDER BY p.updatedAt DESC")
+    @Query("""
+           SELECT p FROM Project p 
+           WHERE p.deletedAt IS NULL 
+           AND EXISTS (
+                SELECT 1 FROM ProjectMember pm
+                WHERE pm.id.userId = :userId
+                AND pm.id.projectId = p.id
+           ) 
+           ORDER BY p.updatedAt DESC
+            """)
     List<Project> findAllAccessibleByUser(@Param("userId") Long userId);
 
-    @Query("SELECT p FROM Project p where p.id = :projectId and p.deletedAt IS NULL")
+    @Query("""
+            SELECT p FROM Project p
+            where p.id = :projectId 
+            and p.deletedAt IS NULL
+            AND EXISTS (
+                SELECT 1 FROM ProjectMember pm
+                WHERE pm.id.userId = :userId
+                AND pm.id.projectId = :projectId
+           ) 
+            """)
     Optional<Project> findAccessibleProjectById(@Param("projectId") Long projectId, @Param("userId") Long userId);
 }
