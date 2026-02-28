@@ -22,3 +22,12 @@ server:
 
 jwt:
   secret-key: nckscnkfhqweurkhwqkndkqwhroiu1worksankfhasluroiqwekfnskjghjkwerlfydklhS
+
+stripe:
+  api:
+    secret: sk_test_51T2jjuD8MHp65DgYJquRGDeOoJ7DnSohfoOsElFksnJ47kNhnQFz6cyxDkCi554i2bUBv7y21i8Vih2hC46ceqZS00qLLQF4l7
+  webhook:
+    secret: whsec_e28cb3b4722bf346dfcee9fa58705030cb991495faa835ef26e17cd5ad4651a6
+
+client:
+  url: http://localhost:8080
