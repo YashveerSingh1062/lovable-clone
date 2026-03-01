@@ -3,9 +3,9 @@ spring:
     name: lovable-clone
 
   datasource:
-    url: jdbc:postgresql://localhost:9000/testDB
-    username: testuser
-    password: password
+    url: jdbc:postgresql://localhost:5432/lovable
+    username: postgres
+    password: Rishi1062@
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -30,4 +30,4 @@ stripe:
     secret: whsec_e28cb3b4722bf346dfcee9fa58705030cb991495faa835ef26e17cd5ad4651a6
 
 client:
-  url: http://localhost:8080
+  url: http://localhost:8081
