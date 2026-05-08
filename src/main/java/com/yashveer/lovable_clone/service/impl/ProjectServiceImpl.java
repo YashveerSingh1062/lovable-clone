@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true,level = AccessLevel.PRIVATE)
+@Slf4j
 @Transactional
 public class ProjectServiceImpl implements ProjectService {
 
@@ -57,22 +59,27 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
-
+        log.info("createProject called");
+        log.info(String.valueOf(subscriptionService.canCreateNewProject()));
         if(!subscriptionService.canCreateNewProject()){
             throw new BadRequestException("User cannot create a New project with current Plan, Upgrade plan now.");
         }
 
         Long userId = authUtil.getCurrentUserId();
+        log.info("userId fetched by authUtil.getCurrentUserId = {} ",userId);
 //        User owner = userRepository.findById(userId).orElseThrow(
 //                () -> new ResourceNotFoundException("User",userId.toString())
 //        );
         User owner = userRepository.getReferenceById(userId);
+        log.info("owner fetched by userRepository.getReferenceById = {} ",owner.toString());
         Project project = Project.builder()
                 .name(request.name())
                 .isPublic(false)
                 .build();
 
         project = projectRepository.save(project);
+
+        log.info("Projct succesfully saved in DB");
 
         ProjectMemberId projectMemberId = new ProjectMemberId(project.getId(),owner.getId());
         ProjectMember projectMember = ProjectMember.builder()
@@ -84,6 +91,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .project(project)
                 .build();
         projectMemberRepository.save(projectMember);
+        log.info("Projctmember succesfully saved in DB");
         return projectMapper.toProjectResponse(project);
     }
 

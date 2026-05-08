@@ -48,7 +48,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 new Subscription()
         );
 
-        return subscriptionMapper.toSubscriptionResponse(currentSubscription);
+        try {
+            return subscriptionMapper.toSubscriptionResponse(currentSubscription);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override
@@ -150,12 +155,15 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public boolean canCreateNewProject() {
+        log.info("canCreateNewProject called");
         Long userId = authUtil.getCurrentUserId();
+        log.info("authUtil.getCurrentUserId() = {}",userId);
         SubscriptionResponse currentSubscription = getCurrentSubscription();
-
+        log.info(currentSubscription.plan().toString()+" "+currentSubscription.status()+ " "+currentSubscription.currentPeriodEnd()+" "+currentSubscription.tokensUsedThisCycle());
         int countOfOwnedProjects = projectMemberRepository.countProjectOwnedByUser(userId);
-
+        log.info("countOfOwnedProjects {}",countOfOwnedProjects);
         if(currentSubscription.plan() == null) {
+            log.info("currentSubscription.plan() == null");
             return countOfOwnedProjects < FREE_TIER_PROJECTS_ALLOWED;
         }
 

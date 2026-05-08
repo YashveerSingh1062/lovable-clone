@@ -65,11 +65,13 @@ public class StripePaymentProcessor implements PaymentProcessor {
 
         try {
             String stripeCustomerId = user.getStripeCustomerId();
+            log.info("stripe customerid {}",stripeCustomerId);
             if(stripeCustomerId == null || stripeCustomerId.isEmpty()) {
                 params.setCustomerEmail(user.getUsername());
             } else {
                 params.setCustomer(stripeCustomerId); // stripe customer Id
             }
+            log.info("params = {} ",params.build());
             Session session = Session.create(params.build()); // making api call to the Stripe Backend
             return new CheckoutResponse(session.getUrl());
         } catch (StripeException e) {
@@ -103,7 +105,7 @@ public class StripePaymentProcessor implements PaymentProcessor {
 
     @Override
     public void handleWebhookEvent(String type, StripeObject stripeObject, Map<String, String> metadata) {
-        log.debug("Handling stripe event: {}", type);
+        log.info("Handling stripe event: {}", type);
 
         switch (type) {
             case "checkout.session.completed" -> handleCheckoutSessionCompleted((Session) stripeObject, metadata); // one-time, on checkout completed
@@ -117,10 +119,10 @@ public class StripePaymentProcessor implements PaymentProcessor {
 
     private void handleCheckoutSessionCompleted(Session session, Map<String, String> metadata) {
         if(session == null) {
-            log.error("session object was null");
+            log.info("session object was null");
             return;
         }
-
+        log.info("handleCheckoutSessionCompleted called");
         Long userId = Long.parseLong(metadata.get("user_id"));
         Long planId = Long.parseLong(metadata.get("plan_id"));
 
@@ -134,6 +136,7 @@ public class StripePaymentProcessor implements PaymentProcessor {
         }
 
         subscriptionService.activateSubscription(userId, planId, subscriptionId, customerId);
+        log.info("subscriptionService.activateSubscription called");
     }
 
     private void handleCustomerSubscriptionUpdated(Subscription subscription) {

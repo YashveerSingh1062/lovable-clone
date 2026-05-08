@@ -3,8 +3,11 @@ spring:
     name: lovable-clone
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/lovable
-    username: postgres
+#    url: jdbc:postgresql://localhost:5432/testDB
+#    username: testuser
+#    password: password
+    url: jdbc:postgresql://localhost:9010/pgvector-test
+    username: rishi
     password: Rishi1062@
     driver-class-name: org.postgresql.Driver
 
@@ -19,7 +22,7 @@ spring:
 
   ai:
     openai:
-      api-key:
+      api-key: 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
       base-url: https://openrouter.ai/api
       chat:
         options:
@@ -41,3 +44,14 @@ stripe:
 
 client:
   url: http://localhost:8081
+
+logging:
+  level:
+    org.springframework.ai:
+      chat.client: DEBUG
+
+minio:
+  url: http://localhost:9000          # or minio:9000 if inside docker network
+  access-key: minioadmin
+  secret-key: Admin@1234
+  project-bucket: projects

@@ -2,7 +2,7 @@ package com.yashveer.lovable_clone.dto.subscription;
 
 public record PlanResponse(
         Long id,
-        Long name,
+        String name,
         Integer maxProjects,
         Integer maxTokensPerDay,
         Boolean unlimitedAi,
