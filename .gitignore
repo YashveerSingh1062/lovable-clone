@@ -31,6 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
-# Secret files
-application.yml
+### Secret files
+src/main/resources/application.yml
 
