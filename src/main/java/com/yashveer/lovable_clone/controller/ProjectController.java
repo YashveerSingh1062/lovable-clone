@@ -1,8 +1,10 @@
 package com.yashveer.lovable_clone.controller;
 
+import com.yashveer.lovable_clone.dto.deploy.DeployResponse;
 import com.yashveer.lovable_clone.dto.project.ProjectRequest;
 import com.yashveer.lovable_clone.dto.project.ProjectResponse;
 import com.yashveer.lovable_clone.dto.project.ProjectSummaryResponse;
+import com.yashveer.lovable_clone.service.DeploymentService;
 import com.yashveer.lovable_clone.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +15,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/projects")
+@RequiredArgsConstructor
 public class ProjectController {
+
     private final ProjectService projectService;
+//    private final DeploymentService deploymentService;
 
     @GetMapping
     public ResponseEntity<List<ProjectSummaryResponse>> getMyProjects() {
@@ -24,7 +28,7 @@ public class ProjectController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectResponse> getProjectById(@PathVariable Long id) {
+    public ResponseEntity<ProjectSummaryResponse> getProjectById(@PathVariable Long id) {
         return ResponseEntity.ok(projectService.getUserProjectById(id));
     }
 
@@ -43,4 +47,10 @@ public class ProjectController {
         projectService.softDelete(id);
         return ResponseEntity.noContent().build();
     }
+
+//    @PostMapping("/{id}/deploy")
+//    public ResponseEntity<DeployResponse> deployProject(@PathVariable Long id) {
+//        return ResponseEntity.ok(deploymentService.deploy(id));
+//    }
+
 }

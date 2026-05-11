@@ -16,6 +16,7 @@ import com.yashveer.lovable_clone.repository.ProjectRepository;
 import com.yashveer.lovable_clone.repository.UserRepository;
 import com.yashveer.lovable_clone.security.AuthUtil;
 import com.yashveer.lovable_clone.service.ProjectService;
+import com.yashveer.lovable_clone.service.ProjectTemplateService;
 import com.yashveer.lovable_clone.service.SubscriptionService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -41,47 +42,28 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectMemberRepository projectMemberRepository;
     AuthUtil authUtil;
     SubscriptionService subscriptionService;
-
-    @Override
-    public List<ProjectSummaryResponse> getUserProjects() {
-        Long userId = authUtil.getCurrentUserId();
-        var projects = projectRepository.findAllAccessibleByUser(userId);
-        return projectMapper.toListOfProjectSummaryResponse(projects);
-    }
-
-    @Override
-    @PreAuthorize("@security.canViewProject(#projectId)")
-    public ProjectResponse getUserProjectById(Long projectId) {
-        Long userId = authUtil.getCurrentUserId();
-        Project project = getAccessibleProjectById(projectId,userId);
-        return projectMapper.toProjectResponse(project);
-    }
+    ProjectTemplateService projectTemplateService;
 
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
-        log.info("createProject called");
-        log.info(String.valueOf(subscriptionService.canCreateNewProject()));
-        if(!subscriptionService.canCreateNewProject()){
+
+        if(!subscriptionService.canCreateNewProject()) {
             throw new BadRequestException("User cannot create a New project with current Plan, Upgrade plan now.");
         }
 
         Long userId = authUtil.getCurrentUserId();
-        log.info("userId fetched by authUtil.getCurrentUserId = {} ",userId);
 //        User owner = userRepository.findById(userId).orElseThrow(
-//                () -> new ResourceNotFoundException("User",userId.toString())
+//                () -> new ResourceNotFoundException("User", userId.toString())
 //        );
         User owner = userRepository.getReferenceById(userId);
-        log.info("owner fetched by userRepository.getReferenceById = {} ",owner.toString());
+
         Project project = Project.builder()
                 .name(request.name())
                 .isPublic(false)
                 .build();
-
         project = projectRepository.save(project);
 
-        log.info("Projct succesfully saved in DB");
-
-        ProjectMemberId projectMemberId = new ProjectMemberId(project.getId(),owner.getId());
+        ProjectMemberId projectMemberId = new ProjectMemberId(project.getId(), owner.getId());
         ProjectMember projectMember = ProjectMember.builder()
                 .id(projectMemberId)
                 .projectRole(ProjectRole.OWNER)
@@ -91,17 +73,41 @@ public class ProjectServiceImpl implements ProjectService {
                 .project(project)
                 .build();
         projectMemberRepository.save(projectMember);
-        log.info("Projctmember succesfully saved in DB");
+
+        projectTemplateService.initializeProjectFromTemplate(project.getId());
+
         return projectMapper.toProjectResponse(project);
+    }
+
+    @Override
+    public List<ProjectSummaryResponse> getUserProjects() {
+        Long userId = authUtil.getCurrentUserId();
+        var projectsWithRoles = projectRepository.findAllAccessibleByUser(userId);
+        return projectsWithRoles.stream()
+                .map(p -> projectMapper.toProjectSummaryResponse(p.getProject(), p.getRole()))
+                .toList();
+    }
+
+    @Override
+    @PreAuthorize("@security.canViewProject(#projectId)")
+    public ProjectSummaryResponse getUserProjectById(Long projectId) {
+        Long userId = authUtil.getCurrentUserId();
+
+        var projectWithRole = projectRepository.findAccessibleProjectByIdWithRole(projectId, userId)
+                .orElseThrow(() -> new BadRequestException("Project Not Found"));
+
+        return projectMapper.toProjectSummaryResponse(projectWithRole.getProject(), projectWithRole.getRole());
     }
 
     @Override
     @PreAuthorize("@security.canEditProject(#projectId)")
     public ProjectResponse updateProject(Long projectId, ProjectRequest request) {
         Long userId = authUtil.getCurrentUserId();
-        Project project = getAccessibleProjectById(projectId,userId);
+        Project project = getAccessibleProjectById(projectId, userId);
+
         project.setName(request.name());
         project = projectRepository.save(project);
+
         return projectMapper.toProjectResponse(project);
     }
 
@@ -109,14 +115,16 @@ public class ProjectServiceImpl implements ProjectService {
     @PreAuthorize("@security.canDeleteProject(#projectId)")
     public void softDelete(Long projectId) {
         Long userId = authUtil.getCurrentUserId();
-        Project project = getAccessibleProjectById(projectId,userId);
+        Project project = getAccessibleProjectById(projectId, userId);
+
         project.setDeletedAt(Instant.now());
         projectRepository.save(project);
     }
 
-    // Internal functions
-    public Project getAccessibleProjectById(Long projectId,Long userId){
-        return projectRepository.findAccessibleProjectById(projectId,userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project",projectId.toString()));
+    ///  INTERNAL FUNCTIONS
+
+    public Project getAccessibleProjectById(Long projectId, Long userId) {
+        return projectRepository.findAccessibleProjectById(projectId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project", projectId.toString()));
     }
 }

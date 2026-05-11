@@ -10,6 +10,7 @@ import com.yashveer.lovable_clone.mapper.ProjectFileMapper;
 import com.yashveer.lovable_clone.repository.ProjectFileRepository;
 import com.yashveer.lovable_clone.repository.ProjectRepository;
 import com.yashveer.lovable_clone.service.ProjectFileService;
+import io.minio.GetObjectArgs;
 import io.minio.PutObjectArgs;
 import org.springframework.beans.factory.annotation.Value;
 import io.minio.MinioClient;
@@ -46,9 +47,24 @@ public class ProjectFileServiceImpl implements ProjectFileService {
         return new FileTreeResponse(projectFileNodes);
     }
 
+
     @Override
-    public FileContentResponse getFileContent(Long projectId, String path, Long userId) {
-        return null;
+    public FileContentResponse getFileContent(Long projectId, String path) {
+
+        String objectName = projectId + "/" + path;
+        try (
+                InputStream is = minioClient.getObject(
+                        GetObjectArgs.builder()
+                                .bucket(BUCKET_NAME)
+                                .object(objectName)
+                                .build())) {
+
+            String content = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            return new FileContentResponse(path, content);
+        } catch (Exception e) {
+            log.error("Failed to read file: {}/{}", projectId, path, e);
+            throw new RuntimeException("Failed to read file content", e);
+        }
     }
 
     @Override
