@@ -16,6 +16,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Builder
 public class Subscription {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
@@ -31,7 +32,8 @@ public class Subscription {
     @Enumerated(value = EnumType.STRING)
     SubscriptionStatus status;
 
-    String stripeSubscriptionId;
+    String stripeSubscriptionId; //can be renamed to gatewaySubscriptionId
+
     Instant currentPeriodStart;
     Instant currentPeriodEnd;
     Boolean cancelAtPeriodEnd = false;

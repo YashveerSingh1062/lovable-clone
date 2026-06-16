@@ -18,28 +18,28 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ApiError> handleBadRequest(BadRequestException ex){
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST,ex.getMessage());
-        log.error(apiError.toString(),ex);
+    public ResponseEntity<ApiError> handleBadRequest(BadRequestException ex) {
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage());
+        log.error(apiError.toString(), ex);
         return ResponseEntity.status(apiError.status()).body(apiError);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiError> handleResourceNotFound(ResourceNotFoundException ex){
-        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND,ex.getResourceName()+" with id "+ex.getResourceId()+" not found");
-        log.error(apiError.toString(),ex);
+    public ResponseEntity<ApiError> handleResourceNotFound(ResourceNotFoundException ex) {
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, ex.getResourceName() + " with id " + ex.getResourceId() + " not found");
+        log.error(apiError.toString(), ex);
         return ResponseEntity.status(apiError.status()).body(apiError);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleInputValidationError(MethodArgumentNotValidException ex){
+    public ResponseEntity<ApiError> handleInputValidationError(MethodArgumentNotValidException ex) {
 
         List<ApiFieldError> errors = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> new ApiFieldError(error.getField(),error.getDefaultMessage()))
+                .map(error -> new ApiFieldError(error.getField(), error.getDefaultMessage()))
                 .toList();
 
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST,"Input Validation Failed" ,errors);
-        log.error(apiError.toString(),ex);
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "Input Validation Failed", errors);
+        log.error(apiError.toString(), ex);
         return ResponseEntity.status(apiError.status()).body(apiError);
     }
 

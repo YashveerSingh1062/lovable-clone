@@ -16,10 +16,10 @@ public class StorageConfig {
     private String secretKey;
 
     @Bean
-    public MinioClient minioClient(){
+    public MinioClient minioClient() {
         return MinioClient.builder()
                 .endpoint(url)
-                .credentials(accessKey,secretKey)
+                .credentials(accessKey, secretKey)
                 .build();
     }
 }

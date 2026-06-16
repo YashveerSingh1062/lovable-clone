@@ -1,8 +1,5 @@
 package com.yashveer.lovable_clone.service.impl;
 
-import com.yashveer.lovable_clone.dto.subscription.CheckoutRequest;
-import com.yashveer.lovable_clone.dto.subscription.CheckoutResponse;
-import com.yashveer.lovable_clone.dto.subscription.PortalResponse;
 import com.yashveer.lovable_clone.dto.subscription.SubscriptionResponse;
 import com.yashveer.lovable_clone.entity.Plan;
 import com.yashveer.lovable_clone.entity.Subscription;
@@ -28,6 +25,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
+
     private final AuthUtil authUtil;
     private final SubscriptionRepository subscriptionRepository;
     private final SubscriptionMapper subscriptionMapper;
@@ -36,6 +34,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final ProjectMemberRepository projectMemberRepository;
 
     private final Integer FREE_TIER_PROJECTS_ALLOWED = 100;
+
 
     @Override
     public SubscriptionResponse getCurrentSubscription() {
@@ -48,20 +47,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 new Subscription()
         );
 
-        try {
-            return subscriptionMapper.toSubscriptionResponse(currentSubscription);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
+        return subscriptionMapper.toSubscriptionResponse(currentSubscription);
     }
 
     @Override
     public void activateSubscription(Long userId, Long planId, String subscriptionId, String customerId) {
 
         boolean exists = subscriptionRepository.existsByStripeSubscriptionId(subscriptionId);
-        if (exists)
-            return;
+        if (exists) return;
 
         User user = getUser(userId);
         Plan plan = getPlan(planId);
@@ -155,15 +148,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public boolean canCreateNewProject() {
-        log.info("canCreateNewProject called");
         Long userId = authUtil.getCurrentUserId();
-        log.info("authUtil.getCurrentUserId() = {}",userId);
         SubscriptionResponse currentSubscription = getCurrentSubscription();
-        log.info(currentSubscription.plan().toString()+" "+currentSubscription.status()+ " "+currentSubscription.currentPeriodEnd()+" "+currentSubscription.tokensUsedThisCycle());
+
         int countOfOwnedProjects = projectMemberRepository.countProjectOwnedByUser(userId);
-        log.info("countOfOwnedProjects {}",countOfOwnedProjects);
+
         if(currentSubscription.plan() == null) {
-            log.info("currentSubscription.plan() == null");
             return countOfOwnedProjects < FREE_TIER_PROJECTS_ALLOWED;
         }
 

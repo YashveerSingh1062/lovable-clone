@@ -17,6 +17,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProjectFile {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 

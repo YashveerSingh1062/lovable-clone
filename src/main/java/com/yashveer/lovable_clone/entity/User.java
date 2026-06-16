@@ -19,17 +19,15 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name="users")
+@Table(name = "users")
 public class User implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     String username;
-
-    String name;
-
     String password;
+    String name;
 
     @Column(unique = true)
     String stripeCustomerId;
@@ -40,7 +38,7 @@ public class User implements UserDetails {
     @UpdateTimestamp
     Instant updatedAt;
 
-    Instant deletedAt;
+    Instant deletedAt; //soft delete
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

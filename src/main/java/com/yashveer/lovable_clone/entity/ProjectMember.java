@@ -16,8 +16,9 @@ import org.jspecify.annotations.Nullable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name="project_members")
+@Table(name = "project_members")
 public class ProjectMember {
+
     @EmbeddedId
     ProjectMemberId id;
 
@@ -34,6 +35,6 @@ public class ProjectMember {
     ProjectRole projectRole;
 
     Instant invitedAt;
-
     Instant acceptedAt;
+
 }

@@ -25,6 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class BillingController {
+
     private final PlanService planService;
     private final SubscriptionService subscriptionService;
     private final PaymentProcessor paymentProcessor;
@@ -33,35 +34,35 @@ public class BillingController {
     private String webhookSecret;
 
     @GetMapping("/api/plans")
-    public ResponseEntity<List<PlanResponse>> getAllPlans(){
+    public ResponseEntity<List<PlanResponse>> getAllPlans() {
         return ResponseEntity.ok(planService.getAllActivePlans());
     }
 
     @GetMapping("/api/me/subscription")
-    public ResponseEntity<SubscriptionResponse> getMySubscription(){
-        Long userId = 1L;
+    public ResponseEntity<SubscriptionResponse> getMySubscription() {
         return ResponseEntity.ok(subscriptionService.getCurrentSubscription());
     }
 
     @PostMapping("/api/payments/checkout")
-    public ResponseEntity<CheckoutResponse>createCheckoutResponse(@RequestBody CheckoutRequest request){
+    public ResponseEntity<CheckoutResponse> createCheckoutResponse(
+            @RequestBody CheckoutRequest request
+    ) {
         return ResponseEntity.ok(paymentProcessor.createCheckoutSessionUrl(request));
     }
 
     @PostMapping("/api/payments/portal")
-    public ResponseEntity<PortalResponse>openCustomerPortal(){
-        Long userId = 1L;
+    public ResponseEntity<PortalResponse> openCustomerPortal() {
         return ResponseEntity.ok(paymentProcessor.openCustomerPortal());
     }
 
     @PostMapping("/webhooks/payment")
     public ResponseEntity<String> handlePaymentWebhooks(
             @RequestBody String payload,
-            @RequestHeader("Stripe-Signature") String signHeader
+            @RequestHeader("Stripe-Signature") String sigHeader
     ) {
 
         try {
-            Event event = Webhook.constructEvent(payload, signHeader, webhookSecret);
+            Event event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
 
             EventDataObjectDeserializer deserializer = event.getDataObjectDeserializer();
             StripeObject stripeObject = null;
@@ -97,5 +98,4 @@ public class BillingController {
         }
 
     }
-
 }

@@ -12,24 +12,26 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
-@FieldDefaults(makeFinal = true,level = AccessLevel.PRIVATE)
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class AuthController {
-    private AuthService authService;
-    private UserService userService;
+
+    AuthService authService;
+    UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<AuthResponse>signup(@RequestBody SignupRequest request){
+    public ResponseEntity<AuthResponse> signup(@RequestBody SignupRequest request) {
         return ResponseEntity.ok(authService.signup(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse>login(@RequestBody LoginRequest request){
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserProfileResponse>getProfile(){
+    public ResponseEntity<UserProfileResponse> getProfile() {
         Long userId = 1L;
         return ResponseEntity.ok(userService.getProfile(userId));
     }
+
 }

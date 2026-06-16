@@ -20,7 +20,7 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
-//    private final DeploymentService deploymentService;
+    private final DeploymentService deploymentService;
 
     @GetMapping
     public ResponseEntity<List<ProjectSummaryResponse>> getMyProjects() {
@@ -48,9 +48,9 @@ public class ProjectController {
         return ResponseEntity.noContent().build();
     }
 
-//    @PostMapping("/{id}/deploy")
-//    public ResponseEntity<DeployResponse> deployProject(@PathVariable Long id) {
-//        return ResponseEntity.ok(deploymentService.deploy(id));
-//    }
+    @PostMapping("/{id}/deploy")
+    public ResponseEntity<DeployResponse> deployProject(@PathVariable Long id) {
+        return ResponseEntity.ok(deploymentService.deploy(id));
+    }
 
 }
